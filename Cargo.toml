@@ -2,7 +2,7 @@
 name = "flyg-format"
 description = "The Rust implementation for the Flyg file format"
 authors = ["Tim Janke <tim+github@janke.biz>"]
-version = "0.1.0"
+version = "2021.12.25"
 edition = "2021"
 rust-version = "1.57"
 
