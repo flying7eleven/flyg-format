@@ -13,6 +13,8 @@ pub struct FlygFlight {
     pub landing_speed: f32,
     /// The important time recording of the flight.
     pub times: Times,
+    /// All fuel related dynamic information during the flight.
+    pub fuel_records: Vec<FuelRecord>,
 }
 
 /// All important information about the plane which was used to perform the flight, are
@@ -27,6 +29,19 @@ pub struct PlaneInformation {
     pub fuel_capacity: u32,
     /// The number of engines the plane had when performing the flight.
     pub number_of_engines: u8,
+    /// The weight of one gallon of fuel for the plane in pounds.
+    pub fuel_weight: f32,
+    /// The amount of fuel (in gallons) which is not usable by the plane.
+    pub unusable_fuel_quantity: f32,
+}
+
+/// The [`FuelRecord`] struct holds all information regarding fuel and the flight of the plane (e.g.
+/// the amount of fuel which is currently burned per hour or the remaining fuel in the planes tanks).
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FuelRecord {
+    /// The remaining fuel which the plane is carrying.
+    fuel_quantity: f32,
 }
 
 /// There are four different phases of flight. The first one is the block-off time. This is the time
