@@ -56,6 +56,8 @@ pub enum FlygFormatError {
     CouldNotOpenFile,
     /// The content of the supplied file could not be interpreted.
     FileFormatNotRecognized,
+    /// Could not decompress the file which was provided.
+    DecompressionFailed,
 }
 
 impl std::fmt::Display for FlygFormatError {
@@ -67,20 +69,52 @@ impl std::fmt::Display for FlygFormatError {
             FlygFormatError::FileFormatNotRecognized => {
                 write!(f, "Content of supplied file is not recognized")
             }
+            FlygFormatError::DecompressionFailed => {
+                write!(f, "Could not decompress file")
+            }
         }
     }
 }
 
 impl std::error::Error for FlygFormatError {}
 
+#[cfg(feature = "compression")]
+fn load_flight_from_compressed_file(filename: &str) -> Result<FlygFlight, FlygFormatError> {
+    use libflate::gzip::Decoder;
+
+    match std::fs::File::open(filename) {
+        Ok(file_handle) => match Decoder::new(file_handle) {
+            Ok(decoder) => match serde_json::from_reader(decoder) {
+                Ok(read_obj) => Ok(read_obj),
+                Err(_) => Err(FlygFormatError::FileFormatNotRecognized),
+            },
+            Err(_) => Err(FlygFormatError::DecompressionFailed),
+        },
+        Err(_) => Err(FlygFormatError::CouldNotOpenFile),
+    }
+}
+
 /// Load stored flight information from a file.
 ///
 /// # Errors
-/// If the content of the supplied file is not known to the method, a [`FileFormatNotRecognized`]
-/// error will be returned.
+/// If the content of the supplied file is not known to the method, a
+/// [`FlygFormatError::FileFormatNotRecognized`] error will be returned.
 pub fn load_flight_information_from_file(filename: &str) -> Result<FlygFlight, FlygFormatError> {
     use std::io::BufReader;
 
+    // if the file ends with .cflyg, we assume it is compressed and we can redirect the open
+    // request to the corresponding helper method
+    #[cfg(feature = "compression")]
+    if filename
+        .rsplit('.')
+        .next()
+        .map(|ext| ext.eq_ignore_ascii_case("cflyg"))
+        == Some(true)
+    {
+        return load_flight_from_compressed_file(filename);
+    }
+
+    // for all other cases, we assume its a non-compressed file and we can handle it directly
     match std::fs::File::open(filename) {
         Ok(file_handle) => {
             let buffered_reader = BufReader::new(file_handle);
@@ -114,6 +148,19 @@ mod tests {
     fn loading_a_valid_uncompressed_file_works() {
         // the path to the uncompressed flyg data file which should be used for tests
         let path_to_input_file = "test_data/uncompressed.flyg";
+
+        // try to load the file into memory
+        let result = load_flight_information_from_file(path_to_input_file);
+
+        // check if the file was loaded as expected
+        assert_eq!(true, result.is_ok());
+    }
+
+    #[test]
+    #[cfg(feature = "compression")]
+    fn loading_a_valid_compressed_file_works() {
+        // the path to the uncompressed flyg data file which should be used for tests
+        let path_to_input_file = "test_data/compressed.cflyg";
 
         // try to load the file into memory
         let result = load_flight_information_from_file(path_to_input_file);
