@@ -13,4 +13,4 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 - Added the new error type `FlygFormatError`
 - Added a method (`load_flight_from_compressed_file`) for loading a Flyg data record
 
-[2021.12.26]: https://github.com/olivierlacan/keep-a-changelog/releases/tag/v0.0.1
+[2021.12.26]: https://github.com/flying7eleven/flyg-format/releases/tag/2021.12.26
