@@ -39,3 +39,23 @@ pub struct Times {
     /// The time the plane took off from the runway.
     pub takeoff_time: String,
 }
+
+/// The `FlygFormatError` enum holds all possible errors which can occur when processing a file
+/// with flight data recordings.
+#[derive(Debug)]
+pub enum FlygFormatError {
+    /// The content of the supplied file could not be interpreted.
+    FileFormatNotRecognized,
+}
+
+impl std::fmt::Display for FlygFormatError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            FlygFormatError::FileFormatNotRecognized => {
+                write!(f, "Content of supplied file is not recognized")
+            }
+        }
+    }
+}
+
+impl std::error::Error for FlygFormatError {}
