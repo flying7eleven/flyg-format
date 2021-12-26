@@ -1,3 +1,6 @@
+#![deny(clippy::all)]
+#![deny(clippy::pedantic)]
+
 /// The `FlygFlight` struct is the root of any recorded flight.
 pub struct FlygFlight {
     /// The static information about the used plane.
