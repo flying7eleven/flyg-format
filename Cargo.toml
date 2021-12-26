@@ -6,4 +6,16 @@ version = "2021.12.25"
 edition = "2021"
 rust-version = "1.57"
 
-[dependencies]
+[features]
+default = []
+compression = []
+
+[dependencies.serde]
+version = "1.0.132"
+default-features = false
+features = ["serde_derive"]
+
+[dependencies.serde_json]
+version = "1.0.73"
+default-features = false
+features = ["std"]
