@@ -15,6 +15,8 @@ pub struct FlygFlight {
     pub times: Times,
     /// All fuel related dynamic information during the flight.
     pub fuel_records: Vec<FuelRecord>,
+    /// All position records for the plane during the flight.
+    pub plane_positions: Vec<PositionRecord>,
 }
 
 /// All important information about the plane which was used to perform the flight, are
@@ -41,7 +43,31 @@ pub struct PlaneInformation {
 #[serde(rename_all = "camelCase")]
 pub struct FuelRecord {
     /// The remaining fuel which the plane is carrying.
-    fuel_quantity: f32,
+    pub fuel_quantity: f32,
+}
+
+/// To reconstruct the whole flight, position information are recorded periodically. These records
+/// ([`PositionRecord`]) can be used to determine the exact position and orientation of the plane
+/// during each phase of the performed flight.
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PositionRecord {
+    /// The current altitude of the plane (in reference to the sea level).
+    pub altitude: f32,
+    /// The ground speed of the plane.
+    pub ground_speed: f32,
+    /// The heading of the plane.
+    pub heading: f32,
+    /// The air speed of the plane which is indicated to the pilot.
+    pub indicated_air_speed: f32,
+    /// The latitude component of the planes position.
+    pub latitude: f32,
+    /// The longitude component of the planes position.
+    pub longitude: f32,
+    /// The time the record was created (UTC time).
+    pub time: String,
+    /// The vertical speed of the plane in feet per second.
+    pub vertical_speed: f32,
 }
 
 /// There are four different phases of flight. The first one is the block-off time. This is the time
